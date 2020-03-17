@@ -1,4 +1,4 @@
-import { Handler, Context } from 'aws-lambda';
+import { Context, Handler } from 'aws-lambda';
 import { Server } from 'http';
 import { createServer, proxy } from 'aws-serverless-express';
 import { eventContext } from 'aws-serverless-express/middleware';
@@ -16,18 +16,20 @@ async function bootstrapServer(): Promise<Server> {
     if (!cachedServer) {
         const expressApp = express();
         const nestApp = await NestFactory.create(AppModule, new
-        ExpressAdapter(expressApp))
+
+        ExpressAdapter(expressApp));
         nestApp.use(eventContext());
+
         await nestApp.init();
-        cachedServer = createServer(expressApp, undefined,
-            binaryMimeTypes);
+
+        cachedServer = createServer(expressApp, undefined, binaryMimeTypes);
     }
+
     return cachedServer;
 }
 
-// Export the handler : the entry point of the Lambda function
 export const handler: Handler = async (event: any, context: Context) => {
     cachedServer = await bootstrapServer();
 
     return proxy(cachedServer, event, context, 'PROMISE').promise;
-}
+};
