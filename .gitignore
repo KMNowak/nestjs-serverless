@@ -3,7 +3,10 @@ node_modules
 .vscode
 dist
 .build
+.serverless
 
 # OS metadata
 .DS_Store
 Thumbs.db
+
+*.log
